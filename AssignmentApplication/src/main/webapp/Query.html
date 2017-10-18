@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<link rel="stylesheet"
+	href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+	$(function() {
+		$("#startDatepicker").datepicker({
+			dateFormat : "yy,mm,dd"
+		});
+		$("#endDatepicker").datepicker({
+			dateFormat : "yy,mm,dd"
+		});
+	});
+	$(document)
+			.ready(
+					function() {
+						$('#submitButton')
+								.click(
+										function(e) {
+											e.preventDefault();
+                                            $("#data").empty();
+											var formData = $("#forme")
+													.serialize();
+											$.ajax({
+														url : 'http://localhost:8080/Assignment/assignment/jsonWebservice',
+														type : 'POST',
+														dataType : 'text',
+														data : formData,
+														success : function(data) {
+															var dataJson = JSON
+																	.parse(data);
+															var length = dataJson.length;
+															if (length > 0) {
+																
+																$("#data").append("<table border='1'><tr><td>Image</td><td>Hotel Name</td><td>Country</td><td>Start Date</td><td>End Date</td></tr></table>");
+																for (counter = 0; counter < length; counter++) {
+																	var country=dataJson[counter].destination.country;
+																	var startDate=dataJson[counter].offerDateRange.travelStartDate;
+																	var endDate=dataJson[counter].offerDateRange.travelEndDate;
+																	var imageUrl=dataJson[counter].hotelInfo.hotelImageUrl;
+																	var hotelName=dataJson[counter].hotelInfo.hotelName;
+																	
+																	
+																	
+																	$("#data table").append("<tr><td><img src='"+imageUrl+"'/></td><td>"+hotelName+"</td><td>"+country+"</td><td>"+startDate+"</td><td>"+endDate+"</td>"+"</tr>");
+																}
+															}
+																else{
+																	
+																	$("#data").text("No Elements founded");
+																}
+														}
+													});
+										});
+					});
+</script>
+</head>
+<body>
+
+
+
+	<div>
+		<form id="forme" method="post">
+			<table>
+				<tr>
+					<td>Country</td>
+					<td><input name="country" type="text" /></td>
+
+					<td>Region</td>
+					<td><input name="regionID" type="text" /></td>
+					<td>City</td>
+					<td><input name="city" type="text" /></td>
+				</tr>
+				<tr>
+					<td>Start Date</td>
+					<td><input name="travelStartDate" id="startDatepicker"
+						type="text" /></td>
+					<td>End Date</td>
+					<td><input name="travelEndDate" id="endDatepicker" type="text" /></td>
+				</tr>
+				<tr>
+					<td><input id="submitButton" type="button" value="Search" /></td>
+					<td></td>
+				</tr>
+
+			</table>
+
+		</form>
+	</div>
+	<div id="data"></div>
+
+</body>
+</html>
